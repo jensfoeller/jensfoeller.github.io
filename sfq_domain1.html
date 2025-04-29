@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Snowflake-Style Quiz</title>
+  <style>
+    :root {
+      --primary: #1b75d0;
+      --primary-hover: #135ba1;
+      --text: #2d2d2d;
+      --muted: #6b7280;
+      --bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --border: #e5e7eb;
+      --success: #047857;
+      --error: #dc2626;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .question {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .option-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-family: 'Courier New', monospace;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    input[type="radio"] {
+      margin-right: 0.5rem;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+    }
+
+    .check-button,
+    .reset-button {
+      border: none;
+      border-radius: 4px;
+      padding: 0.4rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .check-button {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .check-button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .reset-button {
+      background-color: #e5e7eb;
+      color: var(--text);
+    }
+
+    .reset-button:hover {
+      background-color: #d1d5db;
+    }
+
+    .feedback {
+      margin-top: 0.75rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+    }
+
+    .correct {
+      color: var(--success);
+    }
+
+    .incorrect {
+      color: var(--error);
+    }
+
+    .explanation {
+      margin-top: 0.5rem;
+      font-size: 0.92rem;
+      color: var(--text);
+      background-color: #f1f5f9;
+      padding: 0.75rem;
+      border-left: 4px solid var(--primary);
+      border-radius: 4px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Snowflake Quiz Trainer</h1>
+<div id="quiz-container"></div>
+
+<script>
+  const questions = [
+     {
+    "id": "A.4",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "The Cloud Services layer in Snowflake handles query optimization, metadata management, authentication, access control, and infrastructure coordination."
+  },
+  {
+    "id": "A.5",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Snowpark is Snowflake\u2019s developer framework that allows coding in Python, Java, or Scala, enabling the development of data pipelines and ML workflows inside Snowflake."
+  },
+  {
+    "id": "A.6",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight is the modern web UI in Snowflake for data exploration, query development, dashboards, and workload monitoring."
+  },
+  {
+    "id": "A.7",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "A UDF (User-Defined Function) enables reusable logic for data transformation that returns a single scalar value."
+  },
+  {
+    "id": "A.8",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Permanent tables persist beyond the session, support fail-safe and time travel, and are the default type of table in Snowflake."
+  },
+  {
+    "id": "A.9",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Streamlit in Snowflake allows users to build and deploy interactive web applications directly within the Snowflake environment using Python."
+  },
+  {
+    "id": "A.10",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Streams track data changes (inserts, updates, deletes) to tables and are used for building change data capture (CDC) pipelines."
+  },
+  {
+    "id": "A.11",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "External tables allow querying data stored in external cloud storage like S3 or Azure Blob without physically loading it into Snowflake."
+  },
+  {
+    "id": "A.12",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Elastic compute allows Snowflake to scale compute resources up or down on demand, independently of storage."
+  },
+  {
+    "id": "A.13",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "SnowSQL is a CLI tool that provides command-line access to Snowflake for executing SQL and administrative tasks."
+  },
+  {
+    "id": "A.14",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Schemas in Snowflake define logical groupings of database objects such as tables, views, and functions."
+  },
+  {
+    "id": "A.15",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Tasks in Snowflake are used to schedule and automate SQL statements, enabling workflow orchestration and data transformation."
+  },
+  {
+    "id": "A.16",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Shares in Snowflake allow secure, read-only data sharing between different Snowflake accounts without copying data."
+  },
+  {
+    "id": "A.17",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Micro-partitioning improves performance by enabling efficient pruning of irrelevant data during query execution."
+  },
+  {
+    "id": "A.18",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Pipes are used in combination with Snowpipe to automate continuous data ingestion from stages into Snowflake tables."
+  },
+  {
+    "id": "A.19",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight provides account-level visibility for monitoring costs, query performance, and overall resource usage."
+  },
+  {
+    "id": "A.20",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "A sequence object generates a unique numeric value, often used to populate primary keys or surrogate keys."
+  },
+  {
+    "id": "A.21",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "A UDTF (User-Defined Table Function) returns a set of rows, unlike a UDF which returns a single value."
+  },
+  {
+    "id": "A.22",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "The Snowflake SQL API provides RESTful endpoints for executing SQL statements programmatically."
+  },
+  {
+    "id": "A.23",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Cortex in Snowflake is the native platform for building and running generative AI and ML models within the Data Cloud."
+  },
+  {
+    "id": "A.24",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Interoperable storage in Snowflake allows compute and storage to scale independently and supports cross-cloud operation."
+  },
+  {
+    "id": "A.25",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "The Cloud Services layer manages authentication, access control, and infrastructure-level metadata in Snowflake."
+  },
+  {
+    "id": "A.26",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "The Business Critical Edition of Snowflake includes advanced security features like tri-secret secure and HIPAA support."
+  },
+  {
+    "id": "A.27",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "The compute layer in Snowflake consists of virtual warehouses that perform all data processing and query execution."
+  },
+  {
+    "id": "A.28",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Interoperable storage is what enables Snowflake to operate seamlessly across AWS, Azure, and Google Cloud."
+  },
+  {
+    "id": "A.29",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Virtual Private Snowflake (VPS) provides dedicated infrastructure for enhanced isolation and compliance requirements."
+  },
+  {
+    "id": "A.30",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "The Cloud Services layer handles SQL parsing and access control enforcement in Snowflake\u2019s architecture."
+  },
+  {
+    "id": "A.31",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Elastic compute allows Snowflake to dynamically scale virtual warehouses based on demand without impacting storage."
+  },
+  {
+    "id": "A.32",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "The Standard Edition offers core features of Snowflake and is suited for general-purpose analytics workloads."
+  },
+  {
+    "id": "A.33",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Snowflake\u2019s storage layer uses columnar format and automatic micro-partitioning for performance and scalability."
+  },
+  {
+    "id": "A.34",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "The compute layer executes queries using virtual warehouses, separating processing from storage."
+  },
+  {
+    "id": "A.35",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "A major benefit of Snowflake\u2019s three-layer architecture is the decoupling of storage, compute, and cloud services, enabling scalability and concurrency."
+  },
+  {
+    "id": "A.36",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Snowsight supports dashboards, worksheet editing, and exploration of data visually through the Snowflake UI."
+  },
+  {
+    "id": "A.37",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "SnowSQL is the command-line interface (CLI) for interacting with Snowflake, allowing execution of SQL and admin tasks."
+  },
+  {
+    "id": "A.38",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Snowflake connectors enable integrations with third-party BI tools like Tableau or Power BI for data visualization and reporting."
+  },
+  {
+    "id": "A.39",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "SnowCD is a deployment management tool that helps automate release pipelines and infrastructure updates for Snowflake projects."
+  },
+  {
+    "id": "A.40",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Snowpark allows developers to write data pipelines in Python or Scala that execute natively in Snowflake, leveraging Snowflake compute."
+  },
+  {
+    "id": "A.41",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "SnowCD supports scheduling and automating CI/CD-style deployments and infrastructure management for Snowflake."
+  },
+  {
+    "id": "A.42",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Streamlit in Snowflake lets users build interactive web applications using Python and SQL directly inside the Data Cloud."
+  },
+  {
+    "id": "A.43",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "The Snowflake SQL API provides RESTful access for executing SQL queries programmatically from external applications."
+  },
+  {
+    "id": "A.44",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Snowflake connectors are used to connect third-party platforms and tools, enabling data movement and queries outside Snowflake."
+  },
+  {
+    "id": "A.45",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Drivers are used for connecting to Snowflake from code via supported languages like Python, Java, etc., enabling programmatic data access."
+  },
+  {
+    "id": "A.46",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Cortex supports notebook creation, scheduling, and orchestration for ML pipelines inside Snowflake."
+  },
+  {
+    "id": "A.47",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "The Snowflake SQL API enables SQL execution over HTTP using Python or other language SDKs."
+  },
+  {
+    "id": "A.48",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight is designed for running, visualizing, and managing SQL queries through a browser-based interface."
+  },
+  {
+    "id": "A.49",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "User-defined functions (UDFs) in Snowflake support writing custom logic in SQL, Java, or Python."
+  },
+  {
+    "id": "A.50",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "DevOps engineers use SnowCD for managing CI/CD pipelines and release orchestration for Snowflake infrastructure."
+  },
+  {
+    "id": "A.51",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Cortex provides native tools in Snowflake for fine-tuning and deploying large language models (LLMs) and other ML use cases."
+  },
+  {
+    "id": "A.52",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Streamlit enables interactive app development using both SQL and Python, offering native Snowflake integration."
+  },
+  {
+    "id": "A.53",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "The Snowflake SQL API offers a REST-based interface for executing SQL statements programmatically."
+  },
+  {
+    "id": "A.54",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "SnowSQL provides the most control and flexibility for scripting, automation, and ad hoc administration in Snowflake."
+  },
+  {
+    "id": "A.55",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Cortex supports embedding ML inference logic and pre-trained models into Snowflake applications."
+  },
+  {
+    "id": "A.56",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "SnowSQL is the command-line tool used for SQL execution, data loading, and account management."
+  },
+  {
+    "id": "A.57",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "SnowCD automates infrastructure updates and deployments using scheduled CI/CD workflows for Snowflake projects."
+  },
+  {
+    "id": "A.58",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Snowpark is designed for code-first development with full support for building ETL pipelines and custom ML workflows."
+  },
+  {
+    "id": "A.59",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight enables dashboard building and SQL development in a visual, browser-based interface."
+  },
+  {
+    "id": "A.60",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Streamlit supports building responsive, AI-powered apps in Python that run natively in Snowflake."
+  },
+  {
+    "id": "A.61",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Snowflake connectors enable integration with external systems, enabling secure and scalable data exchange."
+  },
+  {
+    "id": "A.62",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Cortex provides foundational AI capabilities such as embedding models and vector search directly inside Snowflake."
+  },
+  {
+    "id": "A.63",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "A database in Snowflake is a container for schemas, which in turn contain tables, views, and other objects."
+  },
+  {
+    "id": "A.64",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Stages in Snowflake are used to manage file ingestion and unloading between Snowflake and external storage systems."
+  },
+  {
+    "id": "A.65",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Temporary schemas and objects are deleted automatically once the session ends, making them suitable for transient workloads."
+  },
+  {
+    "id": "A.66",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Transient tables are used for temporary storage without Fail-safe and with limited Time Travel support."
+  },
+  {
+    "id": "A.67",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Secure views provide data protection by restricting visibility of logic and enforcing access control."
+  },
+  {
+    "id": "A.68",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "The VARIANT data type supports storing semi-structured data such as JSON, XML, or Avro efficiently in Snowflake."
+  },
+  {
+    "id": "A.69",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "A UDF in Snowflake returns a single scalar value and encapsulates reusable business logic."
+  },
+  {
+    "id": "A.70",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "UDTFs return a set of rows, enabling row-wise processing of input data using SQL or procedural logic."
+  },
+  {
+    "id": "A.71",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Stored procedures encapsulate complex procedural logic, including variables, loops, and conditionals."
+  },
+  {
+    "id": "A.72",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Streams track data changes in tables and are often used together with tasks in change data capture workflows."
+  },
+  {
+    "id": "A.73",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Tasks execute SQL statements on a defined schedule or based on dependencies, automating pipeline logic."
+  },
+  {
+    "id": "A.74",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Pipes automate the ingestion of files from stages into tables using Snowpipe, supporting continuous data loading."
+  },
+  {
+    "id": "A.75",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Shares in Snowflake allow read-only access to datasets for external accounts without physical data copying."
+  },
+  {
+    "id": "A.76",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Sequences generate unique numeric values commonly used in surrogate keys or sequence-based identifiers."
+  },
+  {
+    "id": "A.77",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Information schemas expose metadata about objects, including user-defined file formats and schema objects."
+  },
+  {
+    "id": "A.78",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Secure views restrict access to underlying logic and data while enforcing fine-grained access control policies."
+  },
+  {
+    "id": "A.79",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Stored procedures in Snowflake support control flow such as IF/ELSE and are suitable for encapsulating business logic."
+  },
+  {
+    "id": "A.80",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "Streams are commonly used in CDC pipelines to track and process data changes incrementally."
+  },
+  {
+    "id": "A.81",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Tasks can be triggered by schedules or predecessor tasks, allowing for complex dependency chaining."
+  },
+  {
+    "id": "A.82",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Pipes must be configured to automate Snowpipe ingestion workflows from cloud storage to Snowflake."
+  },
+  {
+    "id": "A.83",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Shares enable cross-account role and privilege assignment for secure data sharing."
+  },
+  {
+    "id": "A.84",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "VARIANT is ideal for storing nested or semi-structured data formats such as JSON or XML."
+  },
+  {
+    "id": "A.85",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Materialized views are automatically refreshed and optimized for performance on repeated queries."
+  },
+  {
+    "id": "A.86",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Temporary schemas are session-scoped and are deleted when the session ends."
+  },
+  {
+    "id": "A.87",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "UDTFs return multiple rows and are useful for row-wise transformations or set-based operations."
+  },
+  {
+    "id": "A.88",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Each time a sequence is called, it generates a new unique numeric value."
+  },
+  {
+    "id": "A.89",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "External tables reference external cloud storage without physically ingesting the data into Snowflake."
+  },
+  {
+    "id": "A.90",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Information schema provides metadata about Snowflake objects such as tables, views, and functions."
+  },
+  {
+    "id": "A.91",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "UDFs return a single scalar result and can encapsulate custom logic in SQL or other supported languages."
+  },
+  {
+    "id": "A.92",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Streams are designed to track changes to data and are often combined with tasks for CDC solutions."
+  },
+  {
+    "id": "A.93",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Tasks define scheduled executions and dependencies to orchestrate data workflows in Snowflake."
+  },
+  {
+    "id": "A.94",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Stored procedures support procedural logic including loops and conditions to manage complex processes."
+  },
+  {
+    "id": "A.95",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Materialized views are read-only and optimized for fast access to precomputed, frequently used queries."
+  },
+  {
+    "id": "A.96",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Permanent tables persist across sessions and retain full time travel and fail-safe capabilities."
+  },
+  {
+    "id": "A.97",
+    "question": "Which Snowflake object enables secure, reusable logic for data transformation that returns a single value?",
+    "options": [
+      "A. Task",
+      "B. UDF",
+      "C. Stream",
+      "D. View"
+    ],
+    "answer": "B",
+    "explanation": "Internal named stages are managed by Snowflake and used for temporary or internal file storage."
+  },
+  {
+    "id": "A.98",
+    "question": "What type of Snowflake object stores tabular data and is persistent across sessions?",
+    "options": [
+      "A. Temporary table",
+      "B. Transient table",
+      "C. Permanent table",
+      "D. External table"
+    ],
+    "answer": "C",
+    "explanation": "External tables provide live access to data stored in external cloud storage such as S3 or Azure Blob."
+  },
+  {
+    "id": "A.99",
+    "question": "Which Snowflake service supports building and hosting interactive applications directly in the platform?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit in Snowflake",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Stored procedures allow SQL logic with control structures like loops and branching statements."
+  },
+  {
+    "id": "A.100",
+    "question": "Which object in Snowflake allows you to track changes to a table for use in data pipelines?",
+    "options": [
+      "A. Task",
+      "B. Pipe",
+      "C. Stream",
+      "D. Stage"
+    ],
+    "answer": "C",
+    "explanation": "Pipes automate ingestion of cloud-based files into Snowflake tables via Snowpipe."
+  },
+  {
+    "id": "A.101",
+    "question": "Which Snowflake feature enables querying and managing external files stored in cloud storage?",
+    "options": [
+      "A. External tables",
+      "B. Internal stages",
+      "C. Schema-less tables",
+      "D. Snowpipe"
+    ],
+    "answer": "A",
+    "explanation": "Shares allow external accounts to access data in a secure, read-only manner without duplication."
+  },
+  {
+    "id": "A.102",
+    "question": "What does the term \u201celastic compute\u201d refer to in the context of Snowflake?",
+    "options": [
+      "A. Scaling storage independently",
+      "B. Decoupling metadata from compute",
+      "C. Scaling compute resources up and down on demand",
+      "D. Storing semi-structured data"
+    ],
+    "answer": "C",
+    "explanation": "Sequences generate unique IDs and are commonly used for populating surrogate or primary keys."
+  },
+  {
+    "id": "A.103",
+    "question": "Which layer in Snowflake is responsible for query optimization and metadata management?",
+    "options": [
+      "A. Compute layer",
+      "B. Cloud services layer",
+      "C. Storage layer",
+      "D. UI layer"
+    ],
+    "answer": "B",
+    "explanation": "Explanation will be added later based on domain-specific Snowflake documentation."
+  },
+  {
+    "id": "A.104",
+    "question": "Which feature allows developers to write code in languages like Python within Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. Snowflake SQL API"
+    ],
+    "answer": "C",
+    "explanation": "Explanation will be added later based on domain-specific Snowflake documentation."
+  },
+  {
+    "id": "A.105",
+    "question": "Which tool provides a web-based UI for data exploration and query development in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. Cortex",
+      "C. Snowsight",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "Explanation will be added later based on domain-specific Snowflake documentation."
+  }
+  ];
+
+  const container = document.getElementById('quiz-container');
+
+  questions.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const question = document.createElement('div');
+    question.className = 'question';
+    question.innerText = `Question ${item.id}: ${item.question}`;
+    card.appendChild(question);
+
+    const formName = `q${index}`;
+    const radioInputs = [];
+
+    item.options.forEach((opt) => {
+      const label = document.createElement('label');
+      label.className = 'option-label';
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = formName;
+      input.value = opt.charAt(0); // "A", "B", ...
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(opt));
+      card.appendChild(label);
+
+      radioInputs.push(input);
+    });
+
+    const feedback = document.createElement('div');
+    feedback.className = 'feedback';
+
+    const explanation = document.createElement('div');
+    explanation.className = 'explanation';
+    explanation.style.display = 'none';
+    explanation.innerText = item.explanation;
+
+    const checkButton = document.createElement('button');
+    checkButton.className = 'check-button';
+    checkButton.innerText = 'Antwort prüfen';
+
+    checkButton.onclick = () => {
+      const selected = card.querySelector(`input[name="${formName}"]:checked`);
+      if (!selected) {
+        feedback.innerText = 'Bitte eine Antwort auswählen.';
+        feedback.className = 'feedback incorrect';
+        explanation.style.display = 'none';
+        return;
+      }
+      const correct = item.answer;
+      if (selected.value === correct) {
+        feedback.innerText = `✅ Richtig! (${correct})`;
+        feedback.className = 'feedback correct';
+      } else {
+        feedback.innerText = `❌ Falsch. Richtige Antwort: ${correct}`;
+        feedback.className = 'feedback incorrect';
+      }
+      explanation.style.display = 'block';
+    };
+
+    const resetButton = document.createElement('button');
+    resetButton.className = 'reset-button';
+    resetButton.innerText = 'Zurücksetzen';
+
+    resetButton.onclick = () => {
+      radioInputs.forEach(input => input.checked = false);
+      feedback.innerText = '';
+      feedback.className = 'feedback';
+      explanation.style.display = 'none';
+    };
+
+    const buttonRow = document.createElement('div');
+    buttonRow.className = 'button-row';
+    buttonRow.appendChild(checkButton);
+    buttonRow.appendChild(resetButton);
+
+    card.appendChild(buttonRow);
+    card.appendChild(feedback);
+    card.appendChild(explanation);
+    container.appendChild(card);
+  });
+</script>
+
+</body>
+</html>
