@@ -384,6 +384,318 @@
     ],
     "answer": "B",
     "explanation": "Snowflake’s storage is decoupled from compute, allowing independent scaling of storage capacity. This provides flexibility and cost-efficiency when managing large datasets."
+  },
+      {
+    "id": "A.25",
+    "question": "Which Snowflake layer is responsible for managing authentication and infrastructure metadata?",
+    "options": [
+      "A. Storage Layer",
+      "B. Compute Layer",
+      "C. Cloud Services Layer",
+      "D. Application Layer"
+    ],
+    "answer": "C",
+    "explanation": "The Cloud Services layer manages authentication, infrastructure metadata, and query orchestration. It acts as the control plane that ties together compute and storage components."
+  },
+  {
+    "id": "A.26",
+    "question": "Which Snowflake edition includes advanced security features like tri-secret secure?",
+    "options": [
+      "A. Standard Edition",
+      "B. Enterprise Edition",
+      "C. Business Critical Edition",
+      "D. Virtual Private Snowflake (VPS)"
+    ],
+    "answer": "C",
+    "explanation": "The Business Critical Edition includes enhanced security features like tri-secret secure, providing customer-managed encryption keys. It's intended for organizations with stringent compliance needs."
+  },
+  {
+    "id": "A.27",
+    "question": "In Snowflake’s architecture, what does the compute layer primarily consist of?",
+    "options": [
+      "A. Databases and views",
+      "B. Virtual warehouses",
+      "C. Storage containers",
+      "D. Query cache"
+    ],
+    "answer": "B",
+    "explanation": "The compute layer consists of virtual warehouses, which are clusters of compute resources that execute SQL statements. Each warehouse operates independently and can scale as needed."
+  },
+  {
+    "id": "A.28",
+    "question": "What key capability enables Snowflake to run on AWS, Azure, and Google Cloud without major changes?",
+    "options": [
+      "A. Multi-tenant processing",
+      "B. Logical compute scaling",
+      "C. Interoperable storage",
+      "D. Snowpipe auto-scaling"
+    ],
+    "answer": "C",
+    "explanation": "Snowflake’s interoperable storage layer allows it to abstract and unify storage across multiple cloud platforms. This enables seamless multi-cloud support without changing user code."
+  },
+  {
+    "id": "A.29",
+    "question": "Which edition of Snowflake provides dedicated infrastructure for maximum isolation?",
+    "options": [
+      "A. Enterprise Edition",
+      "B. Business Critical Edition",
+      "C. Virtual Private Snowflake",
+      "D. Standard Edition"
+    ],
+    "answer": "C",
+    "explanation": "Virtual Private Snowflake (VPS) provides a completely isolated Snowflake environment with dedicated infrastructure. It's designed for customers with extreme security and regulatory requirements."
+  },
+  {
+    "id": "A.30",
+    "question": "Which layer in Snowflake handles SQL parsing and access control enforcement?",
+    "options": [
+      "A. Compute layer",
+      "B. Virtual warehouse layer",
+      "C. Cloud services layer",
+      "D. Storage layer"
+    ],
+    "answer": "C",
+    "explanation": "The Cloud Services layer is responsible for parsing SQL, validating permissions, and enforcing access control. It ensures centralized governance and query planning across the platform."
+  },
+  {
+    "id": "A.31",
+    "question": "What does “elastic compute” allow Snowflake users to do?",
+    "options": [
+      "A. Store semi-structured data in VARIANT columns",
+      "B. Perform batch loads from cloud storage",
+      "C. Dynamically scale up or down virtual warehouse resources",
+      "D. Share data securely across accounts"
+    ],
+    "answer": "C",
+    "explanation": "Elastic compute refers to Snowflake’s ability to automatically scale compute resources up or down depending on workload demands. This improves performance and cost-efficiency."
+  },
+  {
+    "id": "A.32",
+    "question": "Which Snowflake edition is best suited for general-purpose analytics without advanced features?",
+    "options": [
+      "A. Standard Edition",
+      "B. Enterprise Edition",
+      "C. Business Critical Edition",
+      "D. VPS Edition"
+    ],
+    "answer": "A",
+    "explanation": "The Standard Edition includes core Snowflake capabilities for most analytical workloads. It is cost-effective but lacks advanced security and governance features found in higher tiers."
+  },
+  {
+    "id": "A.33",
+    "question": "What is a key feature of the storage layer in Snowflake?",
+    "options": [
+      "A. Caching of result sets",
+      "B. Automatic clustering of tables",
+      "C. Columnar storage with automatic micro-partitioning",
+      "D. Execution of compiled SQL code"
+    ],
+    "answer": "C",
+    "explanation": "The storage layer uses a columnar format with automatic micro-partitioning, which helps Snowflake optimize query performance. It organizes data for efficient storage and retrieval."
+  },
+  {
+    "id": "A.34",
+    "question": "What is the function of the compute layer in Snowflake?",
+    "options": [
+      "A. Storage of all data across multiple clouds",
+      "B. Performing query execution using virtual warehouses",
+      "C. Managing security policies and governance",
+      "D. Controlling external data loading pipelines"
+    ],
+    "answer": "B",
+    "explanation": "The compute layer is responsible for running SQL queries and data processing jobs. It leverages virtual warehouses to provide isolated and scalable processing power."
+  },
+  {
+    "id": "A.35",
+    "question": "Which of the following is a major advantage of Snowflake’s three-layer architecture?",
+    "options": [
+      "A. Tight coupling of compute and storage",
+      "B. Redundant data replication between compute nodes",
+      "C. Separation of compute, storage, and services for scalability and concurrency",
+      "D. Exclusive use of AWS infrastructure"
+    ],
+    "answer": "C",
+    "explanation": "Snowflake's separation of storage, compute, and services enables users to scale each independently. This architecture improves concurrency, flexibility, and cost control."
+  },
+  {
+    "id": "A.36",
+    "question": "Which Snowflake UI allows visual exploration, dashboards, and worksheet editing?",
+    "options": [
+      "A. SnowCD",
+      "B. Streamlit",
+      "C. Snowsight",
+      "D. SnowSQL"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight is Snowflake’s modern graphical user interface. It supports SQL query development, visualization, and cost monitoring in a user-friendly way."
+  },
+  {
+    "id": "A.37",
+    "question": "What is the primary function of SnowSQL?",
+    "options": [
+      "A. Visualizing dashboards",
+      "B. Executing SQL via command line",
+      "C. Automating AI workloads",
+      "D. Managing driver installations"
+    ],
+    "answer": "B",
+    "explanation": "SnowSQL is a command-line tool used to connect to Snowflake and execute SQL statements. It's useful for automation, scripting, and batch operations."
+  },
+  {
+    "id": "A.38",
+    "question": "Which component enables Snowflake integration with BI tools such as Tableau or Power BI?",
+    "options": [
+      "A. Cortex",
+      "B. Snowflake drivers",
+      "C. Snowflake connectors",
+      "D. Streamlit"
+    ],
+    "answer": "C",
+    "explanation": "Snowflake connectors allow external BI tools and ETL platforms to communicate with Snowflake. They use supported protocols to facilitate secure data access and transfer."
+  },
+  {
+    "id": "A.39",
+    "question": "Which tool helps manage Snowflake deployments and releases?",
+    "options": [
+      "A. SnowCD",
+      "B. Snowsight",
+      "C. Cortex",
+      "D. UDFs"
+    ],
+    "answer": "A",
+    "explanation": "SnowCD (Snowflake Change Deployment) is a tool for CI/CD-style deployment automation. It allows teams to version, test, and promote database code and configurations."
+  },
+  {
+    "id": "A.40",
+    "question": "Which programming framework allows developers to use Python or Scala directly in Snowflake?",
+    "options": [
+      "A. Streamlit",
+      "B. SnowCD",
+      "C. Snowpark",
+      "D. SnowSQL"
+    ],
+    "answer": "C",
+    "explanation": "Snowpark enables writing Snowflake logic using Python, Scala, or Java. This brings procedural programming capabilities closer to the data and avoids data movement."
+  },
+  {
+    "id": "A.41",
+    "question": "Which tool would you use to schedule and automate deployments in Snowflake?",
+    "options": [
+      "A. Snowflake SQL API",
+      "B. SnowCD",
+      "C. Snowsight",
+      "D. Streamlit"
+    ],
+    "answer": "B",
+    "explanation": "SnowCD supports deployment automation, making it ideal for scheduled updates and CI/CD workflows. It integrates well into DevOps pipelines and promotes repeatable deployment."
+  },
+  {
+    "id": "A.42",
+    "question": "Which feature in Snowflake is specifically designed for building interactive web apps?",
+    "options": [
+      "A. Snowpark",
+      "B. Cortex",
+      "C. Streamlit",
+      "D. SnowSQL"
+    ],
+    "answer": "C",
+    "explanation": "Streamlit allows developers to create Python-based interactive web applications. It integrates natively in Snowflake and supports use cases like dashboards and input forms."
+  },
+  {
+    "id": "A.43",
+    "question": "Which component enables RESTful programmatic access to Snowflake?",
+    "options": [
+      "A. Streamlit",
+      "B. Cortex",
+      "C. Snowflake SQL API",
+      "D. SnowCD"
+    ],
+    "answer": "C",
+    "explanation": "The Snowflake SQL API is a REST-based interface that allows programmatic access to Snowflake. It supports executing SQL statements, checking job status, and retrieving results."
+  },
+  {
+    "id": "A.44",
+    "question": "What is a typical use case for Snowflake connectors?",
+    "options": [
+      "A. Hosting Python apps",
+      "B. Real-time SQL editing",
+      "C. Integrating third-party tools with Snowflake",
+      "D. User management"
+    ],
+    "answer": "C",
+    "explanation": "Connectors allow third-party tools like ETL platforms or BI dashboards to interact with Snowflake. They bridge external systems with Snowflake’s APIs or JDBC/ODBC interfaces."
+  },
+  {
+    "id": "A.45",
+    "question": "What distinguishes Snowflake drivers from connectors?",
+    "options": [
+      "A. Drivers are for CLI only",
+      "B. Drivers are used to connect via programming languages",
+      "C. Drivers manage storage layers",
+      "D. Drivers run within Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "Snowflake drivers (like JDBC, ODBC, and Python connectors) enable programmatic interaction through various languages. They're used for direct integration in applications and scripts."
+  },
+  {
+    "id": "A.46",
+    "question": "Which Snowflake tool allows you to create and schedule notebooks and jobs for ML pipelines?",
+    "options": [
+      "A. SnowCD",
+      "B. Cortex",
+      "C. SnowSQL",
+      "D. Streamlit"
+    ],
+    "answer": "B",
+    "explanation": "Cortex provides native capabilities for ML and AI pipelines, including running notebooks and scheduling model inferences. It's Snowflake’s core platform for AI workloads."
+  },
+  {
+    "id": "A.47",
+    "question": "Which of the following allows SQL execution using Python APIs?",
+    "options": [
+      "A. Streamlit",
+      "B. SnowCD",
+      "C. Snowflake SQL API",
+      "D. Snowpark"
+    ],
+    "answer": "C",
+    "explanation": "The Snowflake SQL API provides REST endpoints to execute SQL and retrieve results. It's often used via Python libraries to automate database tasks."
+  },
+  {
+    "id": "A.48",
+    "question": "What is Snowsight primarily used for?",
+    "options": [
+      "A. Visual editing of access roles",
+      "B. Command-line scripting",
+      "C. Running and visualizing SQL queries",
+      "D. Managing storage quotas"
+    ],
+    "answer": "C",
+    "explanation": "Snowsight is a graphical UI for querying, exploring, and visualizing data in Snowflake. It replaces the classic web UI and offers modern features like dashboards and profiling."
+  },
+  {
+    "id": "A.49",
+    "question": "Which technology allows creating custom user-defined functions in Java or Python?",
+    "options": [
+      "A. Streamlit",
+      "B. UDFs",
+      "C. SnowCD",
+      "D. Cortex"
+    ],
+    "answer": "B",
+    "explanation": "User-Defined Functions (UDFs) let users define custom logic in SQL, Java, or Python. They're reusable and ideal for encapsulating business logic in queries."
+  },
+  {
+    "id": "A.50",
+    "question": "Which tool would a DevOps engineer likely use during CI/CD automation in Snowflake?",
+    "options": [
+      "A. SnowSQL",
+      "B. SnowCD",
+      "C. Cortex",
+      "D. Snowsight"
+    ],
+    "answer": "B",
+    "explanation": "SnowCD is designed for deployment and version control in CI/CD pipelines. It automates Snowflake object updates and aligns well with DevOps workflows."
   }
   ];
 
